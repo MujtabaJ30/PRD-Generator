@@ -149,4 +149,4 @@ Key choices documented in [`docs/decisions.md`](./docs/decisions.md):
 
 ## Contact
 
-Built by **Mujtaba Jafri** — [GitHub](https://github.com/MujtabaJ30) · [LinkedIn](https://linkedin.com/in/mujtabajafri)
+Built by **Mujtaba Jafri** — [GitHub](https://github.com/MujtabaJ30) · [LinkedIn](https://linkedin.com/in/mujtaba30)
