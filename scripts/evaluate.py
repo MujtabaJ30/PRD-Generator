@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parent.parent
 WEB_DIR = ROOT / "web"
 DATA_DIR = ROOT / "data"
 
-API_URL = "https://mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app/api/generate"
+API_URL = "https://mujtaba-prd.vercel.app/api/generate"
 JUDGE_BASE_URL = "https://opencode.ai/zen/go/v1"
 JUDGE_MODEL = "deepseek-v4-flash"
 MAX_RETRIES = 2

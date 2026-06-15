@@ -191,7 +191,7 @@ The app is fully functional and working. All 17 files committed.
 2. **Chunk 4 polish** — Stronger success state (`PRD ready` badge + green inline tip), inline tips under the editor and Quick Refine buttons, stronger edit indicator with brand-colored focus border and "Modified" dirty state.
 
 3. **Deployed to Vercel** — Fixed missing `OPENCODE_API_KEY` env var, disabled SSO deployment protection, renamed project to `mujtaba-prd-generator`, and promoted to production.
-   - **Production URL:** https://mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app
+   - **Production URL:** https://mujtaba-prd.vercel.app
 
 4. **Hardened gitignore** — Added comprehensive rules for `.env.*`, `*.pem`, `*.key`, `secrets/`, `node_modules/`, `.vercel`, and build outputs across the whole repo. Verified no sensitive files are tracked.
 

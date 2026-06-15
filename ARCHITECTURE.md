@@ -144,7 +144,7 @@ The prompt is the core feature. It forces the LLM to return a strict JSON object
 ## Deployment
 
 - **Platform:** Vercel (free tier)
-- **URL:** https://mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app
+- **URL:** https://mujtaba-prd.vercel.app
 - **Build:** `cd web && npm run build`
 - **Env vars:** `OPENCODE_API_KEY` set in Vercel dashboard (Production + Preview)
 - **CI/CD:** Git push to `master` triggers auto-deploy

@@ -29,7 +29,7 @@ Then iterate: edit the PRD directly, type a follow-up, or use **Quick Refine** b
 
 ## Try It
 
-**[→ Live Demo](https://mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app)**
+**[→ Live Demo](https://mujtaba-prd.vercel.app)**
 
 Or try one of these example prompts:
 

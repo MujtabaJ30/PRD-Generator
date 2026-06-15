@@ -10,7 +10,7 @@
 
 The app is **live and evaluated**:
 
-1. **Live URL:** https://mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app
+1. **Live URL:** https://mujtaba-prd.vercel.app
 2. Input a problem statement → Get a structured PRD in ~10–20 seconds
 3. 7 sections generated: Problem Statement, Persona, User Stories, Acceptance Criteria, Success Metrics, Edge Cases, Open Questions
 4. Split-screen UI: chat history on the left, editable PRD preview on the right
