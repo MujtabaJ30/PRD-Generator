@@ -201,16 +201,6 @@ function DownloadIcon({ className = "w-4 h-4" }: { className?: string }) {
   );
 }
 
-function PrintIcon({ className = "w-4 h-4" }: { className?: string }) {
-  return (
-    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="6 9 6 2 18 2 18 9" />
-      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-      <rect width="12" height="8" x="6" y="14" />
-    </svg>
-  );
-}
-
 function PlusIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -308,6 +298,7 @@ export default function Home() {
   const [progress, setProgress] = useState(0);
   const [activePanel, setActivePanel] = useState<"chat" | "preview">("chat");
   const [lastPrompt, setLastPrompt] = useState("");
+  const [isEditorFocused, setIsEditorFocused] = useState(false);
 
   const abortRef = useRef<AbortController | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -643,6 +634,7 @@ export default function Home() {
   const inputTooShort = input.trim().length > 0 && input.trim().length < MIN_INPUT_LENGTH;
   const inputTooLong = input.trim().length > MAX_INPUT_LENGTH;
   const canSend = !isLoading && input.trim().length >= MIN_INPUT_LENGTH && !inputTooLong;
+  const isPrdDirty = prd ? editablePrd !== formatPrd(prd) : false;
 
   const headerStatus = useMemo(() => {
     if (isLoading) return draftLabel || "Generating...";
@@ -890,34 +882,30 @@ export default function Home() {
             </h2>
 
             {status === "done" && !isLoading && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1 animate-fade-in-up">
-                <CheckIcon className="w-3 h-3" />
-                Ready
+              <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1.5 animate-fade-in-up shadow-sm shadow-emerald-500/10">
+                <CheckIcon className="w-3.5 h-3.5" />
+                PRD ready
               </span>
             )}
 
-            {/* Version tabs */}
+            {/* Version selector */}
             {versions.length > 0 && (
-              <div className="flex items-center gap-1">
-                <span className="text-[10px] text-zinc-400 uppercase tracking-wider mr-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-zinc-400 uppercase tracking-wider">
                   Version
                 </span>
-                {versions.map((v) => (
-                  <button
-                    key={v.id}
-                    type="button"
-                    onClick={() => switchVersion(v.id)}
-                    disabled={isLoading}
-                    className={`text-xs px-2.5 py-1 rounded-lg transition-colors disabled:opacity-50 ${
-                      activeVersionId === v.id
-                        ? "bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 font-medium"
-                        : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                    }`}
-                    title={v.prompt}
-                  >
-                    v{v.id}
-                  </button>
-                ))}
+                <select
+                  value={activeVersionId}
+                  onChange={(e) => switchVersion(Number(e.target.value))}
+                  disabled={isLoading}
+                  className="text-xs px-2.5 py-1 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 disabled:opacity-50 cursor-pointer"
+                >
+                  {versions.map((v) => (
+                    <option key={v.id} value={v.id} title={v.prompt}>
+                      v{v.id} — {v.prompt.slice(0, 35)}{v.prompt.length > 35 ? "..." : ""}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
           </div>
@@ -946,15 +934,6 @@ export default function Home() {
                 >
                   <DownloadIcon className="w-3.5 h-3.5" />
                   Download
-                </button>
-                <button
-                  type="button"
-                  onClick={() => window.print()}
-                  title="Print PRD (saves as PDF)"
-                  className="text-xs px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex items-center gap-1.5"
-                >
-                  <PrintIcon className="w-3.5 h-3.5" />
-                  Print
                 </button>
               </>
             )}
@@ -1033,34 +1012,50 @@ export default function Home() {
           {prd && (
             <div className="flex-1 flex flex-col min-h-0 gap-2 animate-fade-in-up">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] text-zinc-500 uppercase tracking-wider flex items-center gap-1">
+                <span className="text-[10px] text-brand-600 dark:text-brand-400 uppercase tracking-wider flex items-center gap-1">
                   <svg className="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
                   </svg>
-                  Edit below
+                  Live editor
                 </span>
-                {isLoading && (
-                  <span className="text-[10px] text-brand-600 dark:text-brand-400 animate-pulse">
-                    Updating...
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {isPrdDirty && !isLoading && (
+                    <span className="text-[10px] text-amber-600 dark:text-amber-400 flex items-center gap-1 animate-fade-in-up">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                      Modified
+                    </span>
+                  )}
+                  {isLoading && (
+                    <span className="text-[10px] text-brand-600 dark:text-brand-400 animate-pulse">
+                      Updating...
+                    </span>
+                  )}
+                </div>
               </div>
               <textarea
                 value={editablePrd}
                 onChange={(e) => setEditablePrd(e.target.value)}
+                onFocus={() => setIsEditorFocused(true)}
                 onBlur={() => {
+                  setIsEditorFocused(false);
                   if (prd) {
                     const parsed = parseEditablePrd(editablePrd);
                     if (parsed) setPrd(parsed);
                   }
                 }}
-                className={`flex-1 resize-none rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 p-4 text-sm leading-relaxed font-mono focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all ${
-                  isLoading ? "opacity-60 pointer-events-none" : ""
-                }`}
+                className={`flex-1 resize-none rounded-xl bg-white dark:bg-zinc-900 p-4 text-sm leading-relaxed font-mono focus:outline-none focus:ring-2 focus:ring-brand-500/20 transition-all ${
+                  isEditorFocused
+                    ? "border-l-4 border-l-brand-500 border border-y-zinc-200 border-r-zinc-200 dark:border-y-zinc-700 dark:border-r-zinc-700"
+                    : "border border-zinc-200 dark:border-zinc-700"
+                } ${isLoading ? "opacity-60 pointer-events-none" : ""}`}
                 spellCheck={false}
                 readOnly={isLoading}
                 aria-label="Editable PRD preview"
               />
+              <p className="text-[10px] text-zinc-400 flex items-center gap-1">
+                <LightbulbIcon className="w-3 h-3" />
+                Tip: edit any section, then click away or use Quick Refine to apply changes.
+              </p>
             </div>
           )}
 
@@ -1096,8 +1091,9 @@ export default function Home() {
                   Make Exec-Ready
                 </button>
               </div>
-              <p className="text-[10px] text-zinc-400">
-                Edit the PRD above, then use Quick Refine or type a follow-up.
+              <p className="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <CheckIcon className="w-3 h-3" />
+                PRD generated — edit, copy, download, or refine below.
               </p>
             </div>
           )}

@@ -8,8 +8,15 @@ venv/
 env/
 .venv/
 
-# Environment variables
+# Environment variables and secrets
 .env
+.env.*
+!.env.example
+*.pem
+*.key
+*.secret
+credentials*
+secrets/
 
 # IDEs
 .vscode/
@@ -23,3 +30,13 @@ Thumbs.db
 
 # Data
 data/evaluation_results.json
+
+# Dependencies and build outputs
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# Vercel
+.vercel

@@ -2,7 +2,7 @@
 
 > AI that turns problem statements into structured, interview-ready Product Requirements Documents.
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit-blue)](https://prd-generator-mujtaba.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Visit-blue)](https://mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app)
 [![Stack](https://img.shields.io/badge/Stack-Next.js%2016%20%7C%20React%2019%20%7C%20TypeScript%20%7C%20Tailwind-black)]()
 [![Model](https://img.shields.io/badge/Model-DeepSeek%20V4%20Flash-green)]()
 
@@ -24,7 +24,7 @@ Then iterate: edit the PRD, ask follow-ups, or use **Quick Refine** buttons to a
 
 ## Live Demo
 
-**[prd-generator-mujtaba.vercel.app](https://prd-generator-mujtaba.vercel.app)**
+**[mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app](https://mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app)**
 
 Try it with one of these examples:
 
@@ -50,7 +50,7 @@ PMs spend 2–3 hours on repetitive PRD boilerplate. I wanted to automate the fi
 | **Editable PRD preview** | Edit the generated text directly, then refine from your edits |
 | **Conversational refinement** | Type follow-ups like *"make the metrics more aggressive"* |
 | **Quick Refine buttons** | One-click enhancements: Add Metrics, Expand Edge Cases, Make Exec-Ready |
-| **Copy / Download / Print** | Export as text or print to PDF in one click |
+| **Copy / Download** | Export the PRD as text in one click |
 | **Input validation** | Rejects empty, too-short, or vague inputs before wasting an API call |
 | **Output validation** | Ensures all 7 sections exist and at least one metric is quantitative |
 | **Retry logic** | If the LLM returns malformed JSON, the system retries automatically |
