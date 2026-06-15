@@ -1,4 +1,4 @@
-# PRD Generator — [Live Demo](https://mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app)
+# PRD Generator — [Live Demo](https://mujtaba-prd.vercel.app)
 
 > Turn a problem statement into a structured, interview-ready Product Requirements Document in under 20 seconds.
 
