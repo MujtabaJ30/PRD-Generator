@@ -1,80 +1,162 @@
-# PRD Generator – Architecture & Design
+# PRD Generator — Architecture & System Design
 
 ## Overview
-A lightweight Python tool that takes a problem statement and generates a structured PRD using an LLM API. Built for local execution and portfolio demonstration.
 
-## Tech Stack
-- **Language:** Python 3.11+
-- **LLM API:** Google Gemini 2.0 Flash (free tier, 1,000 requests/day)
-- **UI:** Streamlit (simple web interface, local + screenshots)
-- **Environment:** Python venv (isolated)
-- **Validation:** Manual rubric + comparison against real PRDs
+A full-stack web app that takes a product problem statement and generates a structured PRD using an LLM. Built with Next.js, deployed on Vercel, powered by OpenCode GO.
 
 ## System Architecture
 
 ```
-User Input (Problem Statement)
-    ↓
-Input Validation (length, vagueness check)
-    ↓
-LLM Prompt (structured few-shot)
-    ↓
-Gemini API Call
-    ↓
-Response Parsing (extract structured sections)
-    ↓
-Output Validation (checks for missing sections)
-    ↓
-Formatted PRD Output
+┌─────────────────────────────────────────────────┐
+│  Browser (React 19)                             │
+│  ┌─────────────┐  ┌──────────────────────────┐  │
+│  │ Chat Panel   │  │ PRD Preview (editable)   │  │
+│  │ - messages   │  │ - live editor            │  │
+│  │ - input      │  │ - version dropdown       │  │
+│  │ - refine     │  │ - copy/download          │  │
+│  └──────┬───────┘  └──────────┬───────────────┘  │
+│         │                     │                  │
+│         └──────────┬──────────┘                  │
+│                    │ POST /api/generate           │
+└────────────────────┼────────────────────────────┘
+                     │
+┌────────────────────┼────────────────────────────┐
+│  Next.js API Route (Vercel Serverless)          │
+│                    │                             │
+│  ┌─────────────────▼───────────────────────┐    │
+│  │  1. Validate input                      │    │
+│  │  2. Build prompt (initial / refine)     │    │
+│  │  3. Call OpenCode GO (streaming)        │    │
+│  │  4. Validate JSON output                │    │
+│  │  5. Retry if malformed (up to 2x)       │    │
+│  │  6. Stream SSE events to client         │    │
+│  └─────────────────────────────────────────┘    │
+│                                                  │
+└──────────────────────────────────────────────────┘
+                     │
+┌────────────────────┼────────────────────────────┐
+│  OpenCode GO API   │  (OpenAI-compatible)        │
+│  Model: DeepSeek V4 Flash                       │
+│  Endpoint: https://opencode.ai/zen/go/v1        │
+└──────────────────────────────────────────────────┘
 ```
 
-## Prompt Engineering Strategy
+## Data Flow
 
-### Chain-of-Thought Prompt
-1. **Role context:** "You are a senior PM at a fast-moving startup."
-2. **Task:** "Given a problem statement, draft a structured PRD."
-3. **Output format:** JSON with keys: problem_statement, persona, user_stories, acceptance_criteria, success_metrics, edge_cases, open_questions
-4. **Few-shot examples:** Include 2 real PRD examples (from public blogs) to show expected quality
-5. **Constraints:** "Be specific. Use measurable metrics. Write 3-5 items per section."
+### Generate PRD
+1. User types a problem statement in the chat input
+2. Client sends `POST /api/generate` with `{ problemStatement }`
+3. API route validates input (length, vagueness)
+4. Builds prompt: system prompt + user prompt (structured JSON instruction)
+5. Calls OpenCode GO with `stream: true`
+6. Streams `data: { type: "token" }` events to client as tokens arrive
+7. On stream end, parses full response as JSON
+8. Validates all 7 sections exist + at least one quantitative metric
+9. If invalid, retries with stricter prompt (up to 2 times)
+10. Sends `data: { type: "done", prd: {...} }` to client
+11. Client renders the PRD in the editable preview panel
 
-### Validation Layer
-- Post-LLM check: ensure all 6 sections exist in output
-- If missing: retry with stricter prompt
-- Quality check: output must contain at least one numerical metric
+### Refine PRD
+1. User clicks Quick Refine button or types a follow-up
+2. Client sends `{ problemStatement, currentPrd, refineAction }`
+3. API route builds a refine prompt with the current PRD as JSON context
+4. Same streaming + validation flow as above
+5. Client adds the new PRD as a new version
+
+## Key Components
+
+### `web/src/lib/prompt.ts`
+- `SYSTEM_PROMPT` — role context + output format
+- `buildInitialPrompt()` — first-time generation
+- `buildRefinePrompt()` — add metrics, expand edges, exec-ready
+- `buildRetryPrompt()` — stricter prompt for malformed output
+- `buildConversationalPrompt()` — follow-up questions
+
+### `web/src/lib/validator.ts`
+- `validateInput()` — min/max length, vagueness check
+- `validateOutput()` — JSON parse, all 7 sections, quantitative metric check
+
+### `web/src/lib/config.ts`
+- `OPENCODE_API_KEY` — from `process.env.OPENCODE_API_KEY`
+- `BASE_URL` — `https://opencode.ai/zen/go/v1`
+- `MODEL_NAME` — `deepseek-v4-flash`
+- `MAX_RETRIES` — 2
+
+### `web/src/app/api/generate/route.ts`
+- Streaming API route using `ReadableStream`
+- Instantiates OpenAI client at module scope
+- Sends SSE events: `token`, `retry`, `done`, `error`
+
+### `web/src/app/page.tsx`
+- Split-screen UI: chat on left, editable PRD preview on right
+- State: messages, versions, prd, editablePrd, usage count
+- `parseEditablePrd()` — parses user-edited markdown back to JSON
+- `formatPrd()` — converts JSON PRD to formatted markdown text
+
+## Prompt Strategy
+
+The prompt is the core feature. It forces the LLM to return a strict JSON object with 7 keys:
+
+```json
+{
+  "problem_statement": "...",
+  "persona": "...",
+  "user_stories": ["..."],
+  "acceptance_criteria": ["..."],
+  "success_metrics": ["..."],
+  "edge_cases": ["..."],
+  "open_questions": ["..."]
+}
+```
+
+**Why JSON over Markdown:**
+- Easier to validate programmatically (check for missing keys)
+- Structured rendering in the UI
+- Refinements preserve structure better when the LLM receives JSON and returns JSON
+
+**Validation rules:**
+- All 7 sections must be present
+- At least one `success_metrics` item must contain a number
+- If validation fails, retry with explicit "MUST include all sections" instruction
 
 ## Error Handling
-- Empty input → reject with reason
-- Vague input (<10 chars) → ask for more detail
-- API failure → fallback to cached example (if available) or retry with backoff
-- Missing sections → auto-retry with explicit instruction
 
-## File Structure
-```
-AI project Prodman/
-├── PRD.md                (this file)
-├── ARCHITECTURE.md       (this file)
-├── DATA.md               (test data + evaluation)
-├── README.md             (how to run)
-├── INTERVIEW_PREP.md     (questions + answers)
-├── src/
-│   ├── main.py           (Streamlit app)
-│   ├── prompt.py         (prompt templates)
-│   ├── validator.py      (output validation)
-│   └── config.py         (API key, settings)
-├── data/
-│   ├── test_inputs.json      (test problem statements)
-│   └── real_prds.json        (public PRD examples for evaluation)
-├── .env.example          (template for API key)
-└── requirements.txt      (dependencies)
-```
+| Scenario | Handling |
+|----------|----------|
+| Empty / too short input | Client-side validation, show inline error |
+| Malformed JSON from LLM | Auto-retry up to 2 times with stricter prompt |
+| Missing sections | Auto-retry with explicit section list |
+| API rate limit (429) | Show "rate limit" error to user |
+| Network error | Show error with retry button |
+| User cancels generation | AbortController cancels the fetch |
 
-## API Integration Notes
-- **Google Gemini 2.0 Flash API:** Free tier = 1,000 requests/day, 60 requests/minute
-- **Key storage:** `GOOGLE_API_KEY` in `.env` file (never commit to Git)
-- **Rate limiting:** built-in with retries (exponential backoff)
-- **Cost:** $0 for the free tier
+## Evaluation System
+
+`scripts/evaluate.py` implements an LLM-as-judge evaluator:
+
+1. Reads `data/test_inputs.json` (10 synthetic problem statements)
+2. For each input, calls the live deployed API
+3. Sends the generated PRD to a separate LLM judge (DeepSeek V4 Flash)
+4. Judge scores each of 7 sections 1–5 against a rubric
+5. Results saved incrementally to `data/evaluation_results.json`
+6. Script is resumable — skips already-evaluated inputs on rerun
 
 ## Deployment
-- **Local:** `streamlit run src/main.py`
-- **Portfolio:** screenshots + demo video in GitHub README
-- **Optional:** Hugging Face Spaces (free, no sleep)
+
+- **Platform:** Vercel (free tier)
+- **URL:** https://mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app
+- **Build:** `cd web && npm run build`
+- **Env vars:** `OPENCODE_API_KEY` set in Vercel dashboard (Production + Preview)
+- **CI/CD:** Git push to `master` triggers auto-deploy
+
+## Tech Choices Summary
+
+| Decision | Choice | Why |
+|----------|--------|-----|
+| Framework | Next.js 16 | App Router, API routes, Vercel-native |
+| State | React useState | No need for Redux/Zustand in a single-page app |
+| Streaming | SSE via ReadableStream | Simpler than WebSockets for one-way server→client |
+| Validation | Custom TS validators | Tight control over JSON schema |
+| Styling | Tailwind CSS 4 | Fast iteration, no CSS files |
+| API | OpenCode GO | Cheap, reliable, OpenAI-compatible |
+| Eval | LLM-as-judge | Consistent, reproducible, with manual spot-checks |

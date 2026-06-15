@@ -22,14 +22,14 @@ Product managers spend 2-3 hours drafting PRDs for every feature. Much of this t
   - 3-5 success metrics
   - 3-5 edge cases
   - 2-3 open questions
-- Evaluation: 80%+ of generated sections are rated "useful" by manual review against real PRDs
-- Performance: completes in <10 seconds per generation
-- Input validation: rejects empty or overly vague input (<10 characters)
+- Evaluation: average score ≥ 4.0/5.0 across 10 synthetic test cases (LLM-as-judge)
+- Performance: completes in <20 seconds per generation
+- Input validation: rejects empty, too short (<10 chars), or too long (>2000 chars) input
 
 ## Success Metrics
-- Time saved: draft PRD in <10 seconds vs. 2-3 hours manual
-- Coverage: 6 core PRD sections generated automatically
-- Quality: 80%+ of sections rated useful by manual review
+- Time saved: draft PRD in <20 seconds vs. 2-3 hours manual
+- Coverage: 7 core PRD sections generated automatically
+- Quality: average score ≥ 4.0/5.0 across synthetic test cases (LLM-as-judge)
 - Adoption: (if deployed) number of generations per week
 
 ## Open Questions

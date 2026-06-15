@@ -1,39 +1,76 @@
-# PRD Generator – Interview Prep
+# PRD Generator — Interview Prep
 
 ## Anticipated Questions & Answers
 
 ### Q: "Why did you build this?"
-**A:** "I noticed PMs spend 2-3 hours on repetitive PRD boilerplate. I wanted to see if I could automate the first 80% using an LLM, while keeping the output structured and usable. It also let me practice prompt engineering and API integration at zero cost."
+**A:** "PMs spend 2–3 hours on repetitive PRD boilerplate — user stories, acceptance criteria, success metrics. I wanted to automate the first 80% so PMs can focus on judgment and prioritization, not formatting. It also let me practice prompt engineering, full-stack shipping, and quality evaluation."
 
-### Q: "How is this different from a simple ChatGPT prompt?"
-**A:** "ChatGPT gives a wall of text. This tool forces structured output with a specific JSON format: user stories, acceptance criteria, success metrics, edge cases, and open questions. I added a validation layer that checks if the output is missing any section, and I scored it against real PRDs from Google and Intercom."
+---
 
-### Q: "What API did you use?"
-**A:** "Google Gemini 2.0 Flash. I chose it because the free tier gives 1,000 requests per day — zero cost for a portfolio project. I also had to think about rate limits (60 requests/minute), which is a real constraint I had to design around."
+### Q: "How is this different from just asking ChatGPT?"
+**A:** "Three things. First, ChatGPT gives a wall of text — this forces structured JSON output with exactly 7 sections. Second, there's a validation layer: if a section is missing or a metric isn't quantitative, it retries automatically. Third, the UX is built for iteration — you can edit the PRD directly, use Quick Refine buttons, or type follow-ups, and each version is preserved."
 
-### Q: "How did you handle the hallucination problem?"
-**A:** "I used a few-shot prompt with 2 real PRD examples so the model knows the expected format. I also added a post-processing validation layer: if the output is missing a section or has no metrics, it retries with a stricter prompt. I documented the error rates so I know where it still fails."
+---
 
-### Q: "What would you do in version 2?"
-**A:** "Three things: 1) Add user feedback loop — thumbs up/down on each section so the model improves over time. 2) Export to Notion/Confluence — PRDs are useless if they sit in a terminal. 3) Add a domain-specific mode — the current version is generic, but a PRD for an OKR tool should look different from one for a payments app."
+### Q: "What LLM did you use and why?"
+**A:** "DeepSeek V4 Flash via the OpenCode GO API. I started with Google Gemini's free tier but hit 429 rate limits — unreliable for a demo. OpenCode GO is $5/month with 31,650 requests per 5 hours. DeepSeek V4 Flash is the cheapest model at $0.14 per million input tokens, with good structured-output performance. The API is OpenAI-compatible, so I could use the standard `openai` library."
 
-### Q: "How did you evaluate the quality?"
-**A:** "I built a rubric with 6 sections scored 1-5. I tested it on 10 problem statements, compared outputs against real PRDs from public blogs, and got an average score of 4.2/5.0. I documented the gaps in the README so anyone can see exactly where the tool falls short."
+---
 
-### Q: "What edge cases did you handle?"
-**A:** "Input validation: reject empty or vague input. Output validation: if a section is missing, retry. API failure: exponential backoff. I also tested with ambiguous problem statements — the tool sometimes gives generic answers, which I documented as a known limitation."
+### Q: "How did you handle hallucination?"
+**A:** "The prompt forces a strict JSON schema — the LLM must return exactly 7 keys. The validator checks for missing sections and retries with a stricter prompt if anything is missing. I also validate that at least one success metric is quantitative (contains a number). This catches most hallucination — the LLM can't just ramble."
+
+---
+
+### Q: "How did you evaluate quality?"
+**A:** "I used an LLM-as-judge approach. I wrote 10 synthetic problem statements across different domains — SaaS, fintech, health, edtech, etc. — and ran each through the generator. Then I sent each output to a separate LLM judge with a detailed rubric scoring 7 dimensions from 1–5. The average score was 4.83/5.0. I documented the methodology and raw scores in `DATA.md` and `data/evaluation_results.json` so anyone can verify."
+
+---
+
+### Q: "Doesn't the LLM judge just favor your own generator?"
+**A:** "The judge is a separate model call — it only sees the final PRD and the original problem statement, not the prompt template. It scores against objective criteria like testability and quantification. I also spot-checked the scores manually to catch edge cases."
+
+---
+
+### Q: "What's the weakest part of the tool?"
+**A:** "Problem statements are strong but less quantified than other sections — the LLM reframes the problem clearly but doesn't always add baseline metrics or time loss. That's the highest-leverage prompt improvement. I documented this gap in the README."
+
+---
+
+### Q: "Why Next.js over a simpler stack like Streamlit?"
+**A:** "I started with Streamlit to prove the concept, then rebuilt in Next.js because a portfolio project needs to feel like a real product. Next.js gave me full control over the UI (split-screen, streaming, version history), server-side API routes, and free Vercel deployment. Recruiters judge execution quality, and a real web app signals stronger technical ownership."
+
+---
+
+### Q: "Why JSON output instead of Markdown?"
+**A:** "JSON makes validation easy — I can check for missing keys programmatically. It also makes refinements more reliable: when the LLM receives JSON and returns JSON, it preserves structure better than when it receives markdown. The UI renders from JSON, so I control the formatting."
+
+---
+
+### Q: "What would you do in v2?"
+**A:** "Three things. First, add few-shot examples to the prompt — 2–3 real PRD excerpts to guide the LLM toward higher-quality first drafts. Second, export directly to Notion or Confluence — PRDs are useless sitting in a terminal. Third, add a RAG layer with the company's past PRDs so the output matches their style and terminology."
+
+---
 
 ### Q: "How would you deploy this for a real product team?"
-**A:** "For a real team, I'd use the OpenAI API instead of Gemini because it has better structured output support. I'd add a database layer to store user-generated PRDs, and build a Notion integration for export. The UI would be a web app with user auth so teams can collaborate."
+**A:** "I'd add user authentication (Clerk or NextAuth), a database (Postgres or Supabase) to persist PRDs, and a Notion integration for export. I'd also add team collaboration — shared PRDs, comments, and approval workflows. The current version is a portfolio demo; a production version needs persistence and multi-user support."
 
-### Q: "What would you do if the company had proprietary PRDs?"
-**A:** "I'd use retrieval-augmented generation (RAG) — index the company's past PRDs and use them as few-shot examples in the prompt. That would improve quality and keep the output aligned with the company's style."
+---
+
+### Q: "What edge cases did you handle?"
+**A:** "Input validation: empty, too short, too long. Output validation: missing sections, non-quantitative metrics. API errors: rate limits, network failures. Race conditions: if the user sends a new request while one is streaming, the old one is aborted. I also handle the case where the user edits the PRD text — the edits are parsed back to JSON before being sent for refinement."
+
+---
 
 ### Q: "How did you handle data privacy?"
-**A:** "For this demo, I only used synthetic problem statements — no real company data. If deployed, I'd ensure the API key is stored in environment variables, and the app does not log or store any user inputs."
+**A:** "Only synthetic problem statements — no real company data. The API key is stored in environment variables, never in code. The usage counter is in localStorage only — nothing is sent to a server. No user inputs are logged or stored."
 
-### Q: "What is the hardest part of this project?"
-**A:** "The prompt engineering. Getting the LLM to output consistently structured JSON with specific sections was harder than the code. I had to iterate 10+ times on the prompt to get it to follow the format reliably."
+---
 
-### Q: "Why did you choose Streamlit over React?"
-**A:** "I wanted to ship fast. Streamlit let me go from zero to a working UI in 30 minutes. For a portfolio project, recruiters care more about the idea and the output than the frontend framework."
+### Q: "What's the hardest part of this project?"
+**A:** "Prompt engineering. Getting the LLM to output consistently structured JSON with all 7 sections was harder than the code. I had to iterate on the prompt, add validation, and build retry logic. The second hardest part was the streaming UX — making the progress bar feel natural while tokens stream in."
+
+---
+
+### Q: "Why no database?"
+**A:** "For v1, I wanted to keep it lightweight and free. localStorage handles the usage counter, and the PRD lives in the browser session. Adding a database would let users save and share PRDs, which is a v2 feature."
