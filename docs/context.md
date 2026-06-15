@@ -122,4 +122,62 @@ Google Gemini free tier was unreliable for a demo project. OpenCode GO provides:
 
 ---
 
+## Checkpoint Created
+
+**Git commit:** `07ee9ae` (Phase 1 complete)
+**Checkpoint doc:** `docs/checkpoint.md`
+
+The app is fully functional and working. All 17 files committed.
+
+---
+
+## Session 3: Portfolio Polish — Phase 1 Complete
+
+**Date:** 2026-06-15
+
+### What We Did
+
+1. **Code review with subagent** — Used `@code-reviewer` to identify P0/P1 bugs: race conditions, stream cleanup, version switching after errors, hydration mismatch, accessibility gaps.
+
+2. **Fixed refine failures** — Changed refine/follow-up prompts to receive the PRD as structured JSON instead of markdown text. Added `parseEditablePrd()` to sync user edits back to JSON. This fixed the "Failed to generate valid PRD after retries" error when expanding edge cases after multiple versions.
+
+3. **Added time-based progress bar** — Progress now fills from 0% → 90% over ~20s and jumps to 100% on completion, instead of just pulsing.
+
+4. **Improved UX discoverability**:
+   - Bigger "PRD Generator" heading with subtitle
+   - Clear "Version" label on the selector
+   - "Edit below" label on the preview textarea
+   - Separate, tooltipped shortcuts: `Ctrl + Enter` and `ESC`
+   - Usage counter shows `x/20` with tooltip explaining it's per-browser
+
+5. **Added export options** — Copy, Download TXT, and Print-to-PDF (print stylesheet hides everything except the PRD preview).
+
+6. **Deleted old Python code** — Removed root `src/` and `requirements.txt` since the project is now Next.js-based.
+
+7. **Rewrote README.md** — Portfolio-ready case study with live URL badge, feature table, tech stack, evaluation scores, resume bullets, and future roadmap.
+
+8. **Updated docs/decisions.md** — Rewrote Decisions 1, 2, 4, 8 and added Decisions 9 (Vercel) and 10 (JSON PRD context) to match the actual implementation.
+
+### Files Changed
+
+| File | Action | Notes |
+|------|--------|-------|
+| `web/src/app/page.tsx` | Updated | Fixed races, retries, version switching, added parseEditablePrd, progress bar, print button |
+| `web/src/app/globals.css` | Updated | Added print stylesheet for PDF export |
+| `web/src/lib/prompt.ts` | Updated | JSON-based refine prompts |
+| `web/src/lib/types.ts` | Updated | Added `currentPrd` to request type |
+| `web/src/app/api/generate/route.ts` | Updated | Accepts `currentPrd` JSON, builds JSON-context prompts |
+| `README.md` | Rewritten | Portfolio case study with live URL, features, resume bullets |
+| `docs/decisions.md` | Rewritten | Matches actual Next.js + OpenCode GO stack |
+| `docs/context.md` | Updated | Added Session 3 log |
+| `src/` | Deleted | Old Python code no longer needed |
+| `requirements.txt` | Deleted | Old Python dependencies |
+
+### Next Steps
+
+- Phase 2: Evaluation — create `data/test_inputs.json`, run LLM-as-judge scoring, document results.
+- Phase 3: Final polish — example prompts, loading skeleton screenshot, demo GIF.
+
+---
+
 *This file is updated after every session. It answers: "What did we do today?"*

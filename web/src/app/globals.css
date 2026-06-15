@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans, Arial, Helvetica, sans-serif);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Print: only show the PRD preview block */
+@media print {
+  body > * {
+    display: none !important;
+  }
+  body > .print-preview {
+    display: flex !important;
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    background: white !important;
+    color: black !important;
+  }
+  body > .print-preview * {
+    display: block !important;
+    visibility: visible !important;
+    color: black !important;
+    background: white !important;
+  }
+  body > .print-preview textarea {
+    border: none !important;
+    resize: none !important;
+    outline: none !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    font-family: Georgia, serif !important;
+    font-size: 12pt !important;
+    line-height: 1.6 !important;
+    white-space: pre-wrap !important;
+  }
+}
