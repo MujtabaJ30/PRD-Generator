@@ -180,4 +180,47 @@ The app is fully functional and working. All 17 files committed.
 
 ---
 
+## Session 4: Deploy + Phase 2 Evaluation
+
+**Date:** 2026-06-15
+
+### What We Did
+
+1. **Polished UI per user feedback** — Reverted version selector to dropdown, removed Print button, kept only Copy/Download.
+
+2. **Chunk 4 polish** — Stronger success state (`PRD ready` badge + green inline tip), inline tips under the editor and Quick Refine buttons, stronger edit indicator with brand-colored focus border and "Modified" dirty state.
+
+3. **Deployed to Vercel** — Fixed missing `OPENCODE_API_KEY` env var, disabled SSO deployment protection, renamed project to `mujtaba-prd-generator`, and promoted to production.
+   - **Production URL:** https://mujtaba-prd-generator-4wqjku6ib-mujtabajafri12-3315s-projects.vercel.app
+
+4. **Hardened gitignore** — Added comprehensive rules for `.env.*`, `*.pem`, `*.key`, `secrets/`, `node_modules/`, `.vercel`, and build outputs across the whole repo. Verified no sensitive files are tracked.
+
+5. **Pushed to GitHub** — Committed and pushed to https://github.com/MujtabaJ30/PRD-Generator.
+
+6. **Phase 2 evaluation** — Built `data/test_inputs.json` with 10 cross-domain synthetic prompts, created `scripts/evaluate.py` (LLM-as-judge with DeepSeek V4 Flash), and ran it against the live API.
+   - **Result:** Average overall score **4.83 / 5.0**
+   - Weakest section: Problem Statement (4.20) — less quantified than other sections.
+   - Strongest sections: User Stories (5.00), Persona, Acceptance Criteria, Success Metrics, Edge Cases, Open Questions (all 4.90).
+
+7. **Updated docs** — Rewrote `DATA.md` with actual methodology and results, updated `README.md` with real score and section breakdown.
+
+### Files Changed
+
+| File | Action | Notes |
+|------|--------|-------|
+| `web/src/app/page.tsx` | Updated | Dropdown version selector, removed print, Chunk 4 polish |
+| `README.md` | Updated | Real production URL, 4.83/5.0 score, section table |
+| `DATA.md` | Rewritten | LLM-as-judge methodology, results, reproduction steps |
+| `.gitignore` | Updated | Comprehensive secret/build ignore rules |
+| `data/test_inputs.json` | Created | 10 synthetic problem statements |
+| `data/evaluation_results.json` | Created | Per-input scores and section averages |
+| `scripts/evaluate.py` | Created | Re-runnable LLM-as-judge evaluator |
+| `docs/context.md` | Updated | This session log |
+
+### Next Steps
+
+- Phase 3: Final portfolio packaging — demo screenshot/GIF, resume bullet sync, custom domain (optional).
+
+---
+
 *This file is updated after every session. It answers: "What did we do today?"*

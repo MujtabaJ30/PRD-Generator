@@ -1,0 +1,52 @@
+[
+  {
+    "id": "saas-invoicing",
+    "domain": "SaaS / Freelancer tools",
+    "prompt": "Freelancers waste hours chasing clients for invoices across Gmail, spreadsheets, and apps. Payments are late and it's hard to see who owes what."
+  },
+  {
+    "id": "edtech-room-booking",
+    "domain": "EdTech",
+    "prompt": "Students at a large university struggle to find and book available study rooms across multiple campus buildings. They currently check whiteboards, walk around, or message group chats."
+  },
+  {
+    "id": "fintech-split-expenses",
+    "domain": "Fintech",
+    "prompt": "Roommates and friends lose track of shared expenses after trips, dinners, and rent. They use multiple apps and awkward reminders to settle debts."
+  },
+  {
+    "id": "health-medication-adherence",
+    "domain": "HealthTech",
+    "prompt": "Elderly patients with chronic conditions forget to take their medications on time. Family members worry but have no visibility into adherence."
+  },
+  {
+    "id": "marketplace-thrift-fashion",
+    "domain": "Marketplace",
+    "prompt": "People who want to sell second-hand clothes find it tedious to photograph, price, and list items across multiple marketplace apps. Buyers distrust unknown sellers."
+  },
+  {
+    "id": "productivity-slack-summaries",
+    "domain": "Productivity / B2B",
+    "prompt": "Remote teams miss important Slack threads because channels move too fast. Decisions and action items get buried in long conversations."
+  },
+  {
+    "id": "ecommerce-grocery-substitutions",
+    "domain": "E-commerce",
+    "prompt": "Online grocery shoppers are frustrated when items are out of stock and replacements are chosen without their input, leading to wrong orders and refunds."
+  },
+  {
+    "id": "logistics-delivery-tracking",
+    "domain": "Logistics",
+    "prompt": "Small e-commerce sellers struggle to give customers accurate delivery updates because they ship through multiple carriers with different tracking systems."
+  },
+  {
+    "id": "social-event-planning",
+    "domain": "Social / Consumer",
+    "prompt": "Friends planning a group trip or party spend hours debating dates, locations, and budgets across scattered group chats and spreadsheets."
+  },
+  {
+    "id": "ai-code-review",
+    "domain": "Developer Tools / AI",
+    "prompt": "Junior developers submit pull requests with inconsistent code style, missing tests, and unclear commit messages. Senior engineers spend too much time on repetitive review feedback."
+  }
+]

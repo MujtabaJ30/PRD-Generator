@@ -118,7 +118,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Evaluation
 
-I tested the generator on 10 synthetic problem statements across domains (SaaS, marketplace, fintech, education, health). Each output was scored 1–5 on:
+I tested the generator on 10 synthetic problem statements across domains (SaaS, EdTech, fintech, health, marketplace, productivity, e-commerce, logistics, social, developer tools). Each output was scored 1–5 by an LLM judge (DeepSeek V4 Flash via OpenCode GO) on:
 
 1. Problem clarity
 2. Persona specificity
@@ -128,7 +128,19 @@ I tested the generator on 10 synthetic problem statements across domains (SaaS, 
 6. Edge case realism
 7. Open question depth
 
-**Result:** Average score **4.3 / 5.0** across all sections.
+**Result:** Average score **4.83 / 5.0** across all sections.
+
+| Section | Average Score |
+|---------|--------------|
+| Problem Statement | 4.20 |
+| Persona | 4.90 |
+| User Stories | 5.00 |
+| Acceptance Criteria | 4.90 |
+| Success Metrics | 4.90 |
+| Edge Cases | 4.90 |
+| Open Questions | 4.90 |
+
+See `DATA.md` for the full methodology and `data/evaluation_results.json` for per-input scores.
 
 See `DATA.md` for the full rubric and `docs/context.md` for the evaluation log.
 
@@ -148,7 +160,7 @@ Paste these directly into your resume:
 
 > Built and deployed a full-stack AI PRD generator on Vercel (Next.js, React 19, TypeScript) that turns problem statements into structured product requirements with real-time streaming, version history, and conversational refinement.
 
-> Designed a prompt-engineering and validation pipeline that enforces 7-section JSON output with quantitative metrics, achieving a 4.3/5.0 average quality score across 10 synthetic test cases.
+> Designed a prompt-engineering and validation pipeline that enforces 7-section JSON output with quantitative metrics, achieving a 4.83/5.0 average quality score across 10 synthetic test cases evaluated by an LLM-as-judge.
 
 > Owned end-to-end product development: user research, UX design, API integration, error handling, deployment, and quality evaluation for a portfolio-facing AI tool.
 
